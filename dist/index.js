@@ -8474,8 +8474,8 @@ const { getOctokit } = __nccwpck_require__(5438);
 const owner = core.getInput('owner');
 const repo = core.getInput('repo');
 const branch = core.getInput('branch');
-const users = core.getInput('users').split(',');
-const teams = core.getInput('teams').split(',');
+const users = (core.getInput('users') || '').split(',');
+const teams = (core.getInput('teams') || '').split(',');
 const protectionOn = core.getInput('protection-on') === 'on' ? true : false;
 const githubToken = core.getInput('github-token') || '';
 const run = async () => {
@@ -8526,6 +8526,8 @@ const run = async () => {
           teams: [],
         },
       });
+      
+      core.info("Protection has been turned on.");
     } else {
       await octokit.rest.repos.deleteAdminBranchProtection({
         owner,
@@ -8544,7 +8546,10 @@ const run = async () => {
         repo,
         branch,
       });
+
+      core.info("Protection has been turned off.");
     }
+    
   } catch (e) {
     console.error(e);
     core.setFailed(error.message);

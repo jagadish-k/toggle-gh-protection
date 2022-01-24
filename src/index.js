@@ -4,8 +4,8 @@ const { getOctokit } = require('@actions/github');
 const owner = core.getInput('owner');
 const repo = core.getInput('repo');
 const branch = core.getInput('branch');
-const users = core.getInput('users').split(',');
-const teams = core.getInput('teams').split(',');
+const users = (core.getInput('users') || '').split(',');
+const teams = (core.getInput('teams') || '').split(',');
 const protectionOn = core.getInput('protection-on') === 'on' ? true : false;
 const githubToken = core.getInput('github-token') || '';
 const run = async () => {

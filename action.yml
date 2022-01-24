@@ -19,9 +19,9 @@ inputs:
   branch:
     required: true
   users:
-    required: true
+    required: false
   teams:
-    required: true
+    required: false
   protection-on:
     required: true
     default: on
