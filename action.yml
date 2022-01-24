@@ -1,0 +1,28 @@
+name: "Toggle Protection"
+description: "Toggle Protection Github Branches to enable commit and push actions"
+author: "Jagadish, K. <jagadish.kasi@cleartax.in>"
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
+branding:
+  icon: upload-cloud
+  color: gray-dark
+
+inputs:
+  github-token:
+    required: true
+  owner:
+    required: true
+  repo:
+    required: true
+  branch:
+    required: true
+  users:
+    required: true
+  teams:
+    required: true
+  protection-on:
+    required: true
+    default: on
+  
