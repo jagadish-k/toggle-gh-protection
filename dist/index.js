@@ -8483,7 +8483,7 @@ const run = async () => {
     const octokit = getOctokit(githubToken);
 
     if (protectionOn) {
-      
+
       await octokit.rest.repos.setAdminBranchProtection({
         owner,
         repo,
@@ -8557,20 +8557,23 @@ const run = async () => {
           branch,
         });
       }
+      try {
+        const currentStatusCheckStatus =
+          await octokit.rest.repos.getStatusChecksProtection({
+            owner,
+            repo,
+            branch,
+          });
 
-      const currentStatusCheckStatus =
-        await octokit.rest.repos.getStatusChecksProtection({
-          owner,
-          repo,
-          branch,
-        });
-
-      if (currentStatusCheckStatus.status === 200) {
-        await octokit.rest.repos.removeStatusCheckProtection({
-          owner,
-          repo,
-          branch,
-        });
+        if (currentStatusCheckStatus) {
+          await octokit.rest.repos.removeStatusCheckProtection({
+            owner,
+            repo,
+            branch,
+          });
+        }
+      } catch (e) { 
+        core.info('No status check enabled');
       }
 
       core.info('Protection has been turned off.');
