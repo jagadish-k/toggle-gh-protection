@@ -8483,13 +8483,13 @@ const run = async () => {
     const octokit = getOctokit(githubToken);
 
     if (protectionOn) {
-      await github.rest.repos.setAdminBranchProtection({
+      await octokit.rest.repos.setAdminBranchProtection({
         owner,
         repo,
         branch,
       });
 
-      await github.rest.repos.updateBranchProtection({
+      await octokit.rest.repos.updateBranchProtection({
         owner,
         repo,
         branch,
@@ -8515,7 +8515,7 @@ const run = async () => {
         },
       });
 
-      await github.rest.repos.updatePullRequestReviewProtection({
+      await octokit.rest.repos.updatePullRequestReviewProtection({
         owner,
         repo,
         branch,
