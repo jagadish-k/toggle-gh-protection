@@ -8483,6 +8483,7 @@ const run = async () => {
     const octokit = getOctokit(githubToken);
 
     if (protectionOn) {
+      
       await octokit.rest.repos.setAdminBranchProtection({
         owner,
         repo,
@@ -8526,37 +8527,62 @@ const run = async () => {
           teams: [],
         },
       });
-      
-      core.info("Protection has been turned on.");
+
+      core.info('Protection has been turned on.');
     } else {
-      await octokit.rest.repos.deleteAdminBranchProtection({
-        owner,
-        repo,
-        branch,
-      });
+      const currentAdminBranchProtection =
+        await octokit.rest.repos.getAdminBranchProtection({
+          owner,
+          repo,
+          branch,
+        });
+      if (currentAdminBranchProtection.status === 200) {
+        await octokit.rest.repos.deleteAdminBranchProtection({
+          owner,
+          repo,
+          branch,
+        });
+      }
 
-      await octokit.rest.repos.deletePullRequestReviewProtection({
-        owner,
-        repo,
-        branch,
-      });
+      const currentPullRequestReviewProtection =
+        await octokit.rest.repos.getPullRequestReviewProtection({
+          owner,
+          repo,
+          branch,
+        });
+      if (currentPullRequestReviewProtection.status === 200) {
+        await octokit.rest.repos.deletePullRequestReviewProtection({
+          owner,
+          repo,
+          branch,
+        });
+      }
 
-      await octokit.rest.repos.removeStatusCheckProtection({
-        owner,
-        repo,
-        branch,
-      });
+      const currentStatusCheckStatus =
+        await octokit.rest.repos.getStatusChecksProtection({
+          owner,
+          repo,
+          branch,
+        });
 
-      core.info("Protection has been turned off.");
+      if (currentStatusCheckStatus.status === 200) {
+        await octokit.rest.repos.removeStatusCheckProtection({
+          owner,
+          repo,
+          branch,
+        });
+      }
+
+      core.info('Protection has been turned off.');
     }
-    
   } catch (e) {
     console.error(e);
-    core.setFailed(error.message);
+    core.setFailed(e.message);
   }
 };
 
 run();
+
 })();
 
 module.exports = __webpack_exports__;
