@@ -1,24 +1,18 @@
 const core = require('@actions/core');
-const { getOctokit } = require('@actions/github');
+const { getOctokit, context } = require('@actions/github');
 
-const owner = core.getInput('owner');
-const repo = core.getInput('repo');
+const githubToken = core.getInput('github-token') || '';
 const branch = core.getInput('branch');
 const users = (core.getInput('users') || '').split(',');
 const teams = (core.getInput('teams') || '').split(',');
-const protectionOn = core.getInput('protection-on') === 'on' ? true : false;
-const githubToken = core.getInput('github-token') || '';
+const protectionOn = core.getInput('protection') === 'on' ? true : false;
+
 const run = async () => {
   try {
     const octokit = getOctokit(githubToken);
+    const { owner, repo } = context.repo;
 
     if (protectionOn) {
-      await octokit.rest.repos.setAdminBranchProtection({
-        owner,
-        repo,
-        branch,
-      });
-
       await octokit.rest.repos.updateBranchProtection({
         owner,
         repo,
@@ -28,16 +22,21 @@ const run = async () => {
           contexts: [],
         },
         enforce_admins: true,
+
         required_pull_request_reviews: {
+          dismissal_restrictions: {
+            users,
+            teams,
+          },
           dismiss_stale_reviews: true,
-          required_approving_review_count: 1,
-          dismissal_restrictions: {},
           require_code_owner_reviews: false,
+          required_approving_review_count: 1,
           bypass_pull_request_allowances: {
-            users: [],
-            teams: [],
+            users,
+            teams,
           },
         },
+
         enforce_admins: null,
         restrictions: {
           users,
@@ -45,79 +44,17 @@ const run = async () => {
         },
       });
 
-      await octokit.rest.repos.updatePullRequestReviewProtection({
+      core.info('Protection has been turned on.');
+
+      if (users.length == 0) {
+        core.info('No users have special privileges to bypass protections');
+      }
+    } else {
+      await octokit.rest.repos.deleteBranchProtection({
         owner,
         repo,
         branch,
-        dismiss_stale_reviews: true,
-        required_approving_review_count: 1,
-        bypass_pull_request_allowances: {
-          users: [],
-          teams: [],
-        },
       });
-
-      core.info('Protection has been turned on.');
-    } else {
-      const currentAccessRestrictions =
-        await octokit.rest.repos.getAccessRestrictions({
-          owner,
-          repo,
-          branch,
-        });
-      if (currentAccessRestrictions) {
-        await octokit.rest.repos.deleteAccessRestrictions({
-          owner,
-          repo,
-          branch,
-        });
-      }
-
-      const currentAdminBranchProtection =
-        await octokit.rest.repos.getAdminBranchProtection({
-          owner,
-          repo,
-          branch,
-        });
-      if (currentAdminBranchProtection.status === 200) {
-        await octokit.rest.repos.deleteAdminBranchProtection({
-          owner,
-          repo,
-          branch,
-        });
-      }
-
-      const currentPullRequestReviewProtection =
-        await octokit.rest.repos.getPullRequestReviewProtection({
-          owner,
-          repo,
-          branch,
-        });
-      if (currentPullRequestReviewProtection.status === 200) {
-        await octokit.rest.repos.deletePullRequestReviewProtection({
-          owner,
-          repo,
-          branch,
-        });
-      }
-      try {
-        const currentStatusCheckStatus =
-          await octokit.rest.repos.getStatusChecksProtection({
-            owner,
-            repo,
-            branch,
-          });
-
-        if (currentStatusCheckStatus) {
-          await octokit.rest.repos.removeStatusCheckProtection({
-            owner,
-            repo,
-            branch,
-          });
-        }
-      } catch (e) {
-        core.info('No status check enabled');
-      }
 
       core.info('Protection has been turned off.');
     }

@@ -1,6 +1,6 @@
-name: "Toggle Protection"
-description: "Toggle Protection Github Branches to enable commit and push actions"
-author: "Jagadish, K. <jagadish.kasi@cleartax.in>"
+name: 'Toggle Protection'
+description: 'Toggle Protection Github Branches to enable commit and push actions'
+author: 'Jagadish, K. <kasijagadish@gmail.com>'
 runs:
   using: 'node16'
   main: 'dist/index.js'
@@ -12,17 +12,18 @@ branding:
 inputs:
   github-token:
     required: true
-  owner:
-    required: true
-  repo:
-    required: true
-  branch:
-    required: true
-  users:
-    required: false
-  teams:
-    required: false
-  protection-on:
+    description: Create a PAT token with all of `repo` scope.
+
+  protection:
     required: true
     default: on
-  
+
+  branch:
+    required: false
+    default: main
+
+  users:
+    required: false
+
+  teams:
+    required: false
