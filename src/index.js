@@ -50,7 +50,7 @@ const run = async () => {
         core.info('No users have special privileges to bypass protections');
       }
     } else {
-      const currProtection = await github.rest.repos.getBranchProtection({
+      const currProtection = await octokit.rest.repos.getBranchProtection({
         owner,
         repo,
         branch,
