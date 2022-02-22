@@ -8520,19 +8520,23 @@ const run = async () => {
         core.info('No users have special privileges to bypass protections');
       }
     } else {
-      const currProtection = await octokit.rest.repos.getBranchProtection({
-        owner,
-        repo,
-        branch,
-      });
-      if (currProtection.status === 200) {
-        await octokit.rest.repos.deleteBranchProtection({
+      try {
+        const currProtection = await octokit.rest.repos.getBranchProtection({
           owner,
           repo,
           branch,
         });
+        if (currProtection.status === 200) {
+          await octokit.rest.repos.deleteBranchProtection({
+            owner,
+            repo,
+            branch,
+          });
 
-        core.info('Protection has been turned off.');
+          core.info('Protection has been turned off.');
+        }
+      } catch (err) {
+        console.error(err.message);
       }
     }
   } catch (e) {
