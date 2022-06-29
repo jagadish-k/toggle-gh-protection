@@ -29,7 +29,7 @@ const run = async () => {
             teams,
           },
           dismiss_stale_reviews: true,
-          require_code_owner_reviews: false,
+          require_code_owner_reviews: true,
           required_approving_review_count: 1,
           bypass_pull_request_allowances: {
             users,
