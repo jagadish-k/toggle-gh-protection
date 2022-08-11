@@ -27,3 +27,7 @@ inputs:
 
   teams:
     required: false
+    
+  contexts:
+    required: false
+    default: ""
