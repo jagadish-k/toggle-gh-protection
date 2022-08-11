@@ -8475,6 +8475,7 @@ const githubToken = core.getInput('github-token') || '';
 const branch = core.getInput('branch');
 const users = (core.getInput('users') || '').split(',');
 const teams = (core.getInput('teams') || '').split(',');
+const contexts = (core.getInput('contexts') || '').split(',');
 const protectionOn = core.getInput('protection') === 'on' ? true : false;
 
 const run = async () => {
@@ -8489,7 +8490,7 @@ const run = async () => {
         branch,
         required_status_checks: {
           strict: true,
-          contexts: [],
+          contexts,
         },
         enforce_admins: true,
 
